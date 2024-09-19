@@ -13,7 +13,7 @@ export default function ExploreScreen() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => router.push(`/details/${item.id}`)}
+            onPress={() => router.push(`/${item.id}`)}
             style={styles.partyItem}
           >
             <Text style={styles.partyName}>{item.name}</Text>
