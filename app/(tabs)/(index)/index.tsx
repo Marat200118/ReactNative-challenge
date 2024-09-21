@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+//(index)/index.tsx
+
+import React, { useState, useEffect } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View, Button } from 'react-native';
-import { usePartyStore } from '../../store/usePartyStore';
+import { useEventStore } from '@/store/useEventStore';
 import { router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Generate random location within Kortrijk
 function getRandomLocationInKortrijk() {
@@ -16,7 +18,12 @@ function getRandomLocationInKortrijk() {
   const latitude = Math.random() * (maxLat - minLat) + minLat;
   const longitude = Math.random() * (maxLng - minLng) + minLng;
 
-  return { latitude, longitude };
+  return {
+    latitude,
+    longitude,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01, 
+  };
 }
 
 export default function HomeScreen() {
@@ -27,8 +34,18 @@ export default function HomeScreen() {
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
+  const [storedEvents, setStoredEvents] = useState([]);
+  const events = useEventStore((state) => state.events);
 
-  const parties = usePartyStore((state) => state.parties);
+  useEffect(() => {
+
+    (async () => {
+      const stored = await AsyncStorage.getItem('events');
+      if (stored) {
+        setStoredEvents(JSON.parse(stored));
+      }
+    })();
+  }, []);
 
   return (
     <ThemedView style={styles.container}>
@@ -40,20 +57,20 @@ export default function HomeScreen() {
         showsUserLocation={true}
         initialRegion={randomLocation}
       >
-        {parties.map((party) => (
+        {(events.length ? events : storedEvents).map((event) => (
           <Marker
-            key={party.id}
-            coordinate={party.location}
-            title={party.name}
-            description={party.description}
-            onPress={() => router.push(`/${party.id}`)}
+            key={event.id}
+            coordinate={event.location}
+            title={event.name}
+            description={event.description}
+            onPress={() => router.push(`/${event.id}`)}
           />
         ))}
       </MapView>
       <ThemedView style={styles.addButtonContainer}>
         <Button
-          title="Add Party"
-          onPress={() => router.push('/addParty')}
+          title="Add Event"
+          onPress={() => router.push('/addEvent')}
         />
       </ThemedView>
     </ThemedView>

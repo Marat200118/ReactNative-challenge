@@ -14,7 +14,7 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="index"
+        name="(index)"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
@@ -23,20 +23,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="(explore)"
         options={{
           title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'list' : 'list-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="addParty"
-        options={{
-          title: 'Add Party',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />
           ),
         }}
       />
