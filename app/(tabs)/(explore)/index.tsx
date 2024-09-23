@@ -1,7 +1,9 @@
+//(explore)/index.tsx
+
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useEventStore } from '@/store/useEventStore';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 
 export default function ExploreScreen() {
   const events = useEventStore((state) => state.events);
@@ -14,6 +16,9 @@ export default function ExploreScreen() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ 
+        headerBackVisible: true 
+      }} />
       {events.length > 0 ? (
         <FlatList
           data={events}

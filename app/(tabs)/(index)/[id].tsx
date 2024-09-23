@@ -1,8 +1,12 @@
+// (index)/[id].tsx
+
 import React from 'react';
 import { View, Text, Image, Button, StyleSheet } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useEventStore } from '../../../store/useEventStore';
 import { useRouter } from 'expo-router';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -14,7 +18,7 @@ export default function EventDetailScreen() {
 
   const handleDelete = async () => {
     await deleteEvent(Number(id));
-    router.push('/(tabs)/(explore)/(index)'); // Redirect to Explore page after deleting
+    router.push('/(tabs)/(index)'); // Redirect to Explore page after deleting
   };
 
   if (!event) {
@@ -22,20 +26,22 @@ export default function EventDetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <Stack.Screen options={{ 
         title: event.name, 
         headerBackVisible: true 
       }} />
-      <Text style={styles.eventName}>{event.name}</Text>
+      <ThemedText style={styles.eventName}>{event.name}</ThemedText>
       <Image source={{ uri: event.image }} style={styles.eventImage} />
-      <Text style={styles.eventDescription}>{event.description}</Text>
-      <Text>Number of people: {event.people}</Text>
-      <Text>Drinks: {event.drinks}</Text>
-      <Text>Ambience: {event.lightLevel}</Text>
-      <Text>Intensity: X: {event.acceleration.x}, Y: {event.acceleration.y}, Z: {event.acceleration.z}</Text>
+      <ThemedText style={styles.eventDescription}>{event.description}</ThemedText>
+      <ThemedText>Number of people: {event.people}</ThemedText>
+      <ThemedText>Drinks: {event.drinks}</ThemedText>
+      <ThemedText>Ambience: {event.lightAmbience ? event.lightAmbience : "No information"}</ThemedText>
+      {/* <ThemedText>Ambience: {event.lightLevel}</ThemedText> */}
+      <ThemedText>Intensity: {event.intensity ? event.intensity : "No information"}</ThemedText>
+      {/* <ThemedText>Intensity: X: {event.acceleration.x}, Y: {event.acceleration.y}, Z: {event.acceleration.z}</ThemedText> */}
       <Button title="Delete Event" onPress={handleDelete} />
-    </View>
+    </ThemedView>
   );
 }
 
