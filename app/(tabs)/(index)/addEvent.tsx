@@ -14,8 +14,8 @@ export default function AddEventScreen() {
   const [description, setDescription] = useState('');
   const [people, setPeople] = useState('');
   const [drinks, setDrinks] = useState('');
-  const [image, setImage] = useState(null);
-  const [lightLevel, setLightLevel] = useState(null);
+  const [image, setImage] = useState(null); // This will store the image URI
+  const [lightLevel, setLightLevel] = useState(0);
   const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
   const [location, setLocation] = useState(null);
 
@@ -51,13 +51,14 @@ export default function AddEventScreen() {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
+
     if (!result.canceled) {
-      setImage(result.uri);
+      setImage(result.assets[0].uri); // Save the image URI
     }
   };
 
@@ -95,7 +96,7 @@ export default function AddEventScreen() {
       description,
       people: Number(people),
       drinks,
-      image,
+      image, // Save the image URI
       location,
       lightLevel: lightLevel ? lightLevel.toFixed(2) : null,
       acceleration: {
@@ -103,8 +104,8 @@ export default function AddEventScreen() {
         y: acceleration.y.toFixed(2),
         z: acceleration.z.toFixed(2),
       },
-      lightAmbience: getLightAmbience(), // Call the function to get light ambience
-      intensity: getEventIntensity(), // Call the function to get event intensity
+      lightAmbience: getLightAmbience(),
+      intensity: getEventIntensity(),
     };
 
     await addEvent(newEvent);

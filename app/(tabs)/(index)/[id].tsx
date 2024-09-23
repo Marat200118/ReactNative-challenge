@@ -32,7 +32,11 @@ export default function EventDetailScreen() {
         headerBackVisible: true 
       }} />
       <ThemedText style={styles.eventName}>{event.name}</ThemedText>
-      <Image source={{ uri: event.image }} style={styles.eventImage} />
+      {event.image ? (
+        <Image source={{ uri: event.image }} style={styles.eventImage} />
+      ) : (
+        <ThemedText>No Image Available</ThemedText>
+      )}
       <ThemedText style={styles.eventDescription}>{event.description}</ThemedText>
       <ThemedText>Number of people: {event.people}</ThemedText>
       <ThemedText>Drinks: {event.drinks}</ThemedText>
