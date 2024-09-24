@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Button, Image, View, Text, StyleSheet } from 'react-native';
+import { TextInput, Button, Image, View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useEventStore } from '../../../store/useEventStore';
 import * as ImagePicker from 'expo-image-picker';
 import { Accelerometer, LightSensor } from 'expo-sensors';
@@ -85,6 +85,11 @@ export default function AddEventScreen() {
   };
 
   const handleSubmit = async () => {
+    if (!name || !description || !people || !drinks || !image) {
+      Alert.alert('Error', 'All fields, including the image, must be filled in!');
+      return;
+    }
+
     const randomLocation = getRandomLocationInKortrijk();
 
     const newEvent = {
@@ -93,7 +98,7 @@ export default function AddEventScreen() {
       description,
       people: Number(people),
       drinks,
-      image: image || '',
+      image,
       location: randomLocation, // Use random location within Kortrijk
       lightLevel: lightLevel ? lightLevel.toFixed(2) : null,
       acceleration: {
@@ -109,71 +114,112 @@ export default function AddEventScreen() {
     router.push('/(tabs)/(index)');
   };
 
-  return (
-    <View style={{ 
-        flex: 1, 
-        padding: 16, 
-        justifyContent: 'center', 
-        alignItems: 'center' 
-      }}>
-      <TextInput placeholder="Event Name" value={name} onChangeText={setName} style={{ 
-          borderBottomWidth: 1, 
-          width: '100%', 
-          marginBottom: 12, 
-          padding: 8 
-        }} 
+    return (
+    <View style={styles.container}>
+      <TextInput 
+        placeholder="Event Name" 
+        value={name} 
+        onChangeText={setName} 
+        style={styles.input} 
       />
-      <TextInput placeholder="Description" value={description} onChangeText={setDescription} style={{ 
-          borderBottomWidth: 1, 
-          width: '100%', 
-          marginBottom: 12, 
-          padding: 8 
-        }} 
+      <TextInput 
+        placeholder="Description" 
+        value={description} 
+        onChangeText={setDescription} 
+        style={styles.input} 
       />
-      <TextInput placeholder="Number of People" value={people} onChangeText={setPeople} keyboardType="numeric" style={{ 
-          borderBottomWidth: 1, 
-          width: '100%', 
-          marginBottom: 12, 
-          padding: 8 
-        }} 
+      <TextInput 
+        placeholder="Number of People" 
+        value={people} 
+        onChangeText={setPeople} 
+        keyboardType="numeric" 
+        style={styles.input} 
       />
-      <TextInput placeholder="Drinks" value={drinks} onChangeText={setDrinks} style={{ 
-          borderBottomWidth: 1, 
-          width: '100%', 
-          marginBottom: 12, 
-          padding: 8 
-        }} 
+      <TextInput 
+        placeholder="Drinks" 
+        value={drinks} 
+        onChangeText={setDrinks} 
+        style={styles.input} 
       />
-      <ThemedView style={{
-        marginVertical: 12, 
-        padding: 10, 
-        borderColor: 'grey', 
-        borderWidth: 1, 
-        borderRadius: 8, 
-        backgroundColor: '#f9f9f9', 
-        width: '100%'
-      }}>
-        <ThemedText style={{ fontSize: 16, marginVertical: 4 }}>
-          Light Level: {lightLevel ? lightLevel.toFixed(2) : 'Loading...'}
-        </ThemedText>
-        <ThemedText>
+      
+      <ThemedView style={styles.sensorContainer}>
+        <ThemedText style={styles.sensorText}>
           Light Ambience: {lightLevel ? getLightAmbience() : 'Loading...'}
         </ThemedText>
-        <ThemedText style={{ 
-          fontSize: 16, 
-          marginVertical: 4 
-        }}>
-          Acceleration: X: {acceleration.x.toFixed(2)}, Y: {acceleration.y.toFixed(2)}, Z: {acceleration.z.toFixed(2)}
+        <ThemedText style={styles.sensorText}>
+          Intensity: {acceleration.x ? getEventIntensity() : 'Loading...'}
         </ThemedText>
       </ThemedView>
 
-      <Button title="Pick Image" onPress={pickImage} />
-      {image && <Image source={{ uri: image }} style={{ 
-        width: 200, 
-        height: 200, 
-        marginVertical: 16 
-      }} />}
-      <Button title="Add Event" onPress={handleSubmit} />
+      <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+        <Text style={styles.imageButtonText}>Pick Image</Text>
+      </TouchableOpacity>
+      {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
+      
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <Text style={styles.submitButtonText}>Add Event</Text>
+      </TouchableOpacity>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: '100%',
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+  },
+  sensorContainer: {
+    marginVertical: 12,
+    padding: 10,
+    borderColor: 'grey',
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: '#e0e0e0',
+    width: '100%',
+  },
+  sensorText: {
+    fontSize: 16,
+    color: '#333',
+    marginVertical: 4,
+  },
+  imageButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 16,
+  },
+  imageButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  imagePreview: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    marginVertical: 16,
+  },
+  submitButton: {
+    backgroundColor: '#2196F3',
+    padding: 16,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});
