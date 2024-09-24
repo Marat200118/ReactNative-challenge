@@ -15,7 +15,10 @@ export default function ExploreScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={{ 
+      flex: 1, 
+      padding: 16 
+    }}>
       <Stack.Screen options={{ 
         headerBackVisible: true 
       }} />
@@ -26,9 +29,19 @@ export default function ExploreScreen() {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => router.push(`/${item.id}`)}
-              style={styles.eventItem}
+              style={{ 
+                padding: 16, 
+                backgroundColor: '#f0f0f0', 
+                marginVertical: 8, 
+                borderRadius: 8 
+              }}
             >
-              <Text style={styles.eventName}>{item.name}</Text>
+              <Text style={{ 
+                fontSize: 18, 
+                fontWeight: 'bold' 
+              }}>
+                {item.name}
+              </Text>
               <Text>{item.description}</Text>
             </TouchableOpacity>
           )}
@@ -39,20 +52,3 @@ export default function ExploreScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  eventItem: {
-    padding: 16,
-    backgroundColor: '#f0f0f0',
-    marginVertical: 8,
-    borderRadius: 8,
-  },
-  eventName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});

@@ -48,9 +48,9 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={{ flex: 1 }}>
       <MapView
-        style={styles.map}
+        style={{ width: '100%', height: '100%' }}
         region={region}
         scrollEnabled={true}
         zoomEnabled={true}
@@ -67,32 +67,20 @@ export default function HomeScreen() {
           />
         ))}
       </MapView>
-      <ThemedView style={styles.addButtonContainer}>
-        <Button
-          title="Add Event"
-          onPress={() => router.push('/addEvent')}
-        />
+      <ThemedView
+        style={{
+          backgroundColor: 'yellow',
+          borderRadius: 8,
+          borderWidth: 2,
+          borderColor: 'black',
+          position: 'absolute',
+          bottom: 20,
+          left: 20,
+          right: 20,
+        }}
+      >
+        <Button title="Add Event" onPress={() => router.push('/addEvent')} />
       </ThemedView>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    width: '100%',
-    height: '100%',
-  },
-  addButtonContainer: {
-    backgroundColor: 'yellow',
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: 'black',
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-  },
-});

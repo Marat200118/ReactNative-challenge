@@ -18,7 +18,7 @@ export default function EventDetailScreen() {
 
   const handleDelete = async () => {
     await deleteEvent(Number(id));
-    router.push('/(tabs)/(index)'); // Redirect to Explore page after deleting
+    router.push('/(tabs)/(index)');
   };
 
   if (!event) {
@@ -26,27 +26,43 @@ export default function EventDetailScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={{ 
+        flex: 1, 
+        padding: 16 
+      }}>
       <Stack.Screen options={{ 
         title: event.name, 
         headerBackVisible: true 
       }} />
-      <ThemedText style={styles.eventName}>{event.name}</ThemedText>
+      <ThemedText style={{ 
+        fontSize: 24, 
+        fontWeight: 'bold' 
+      }}>
+        {event.name}
+      </ThemedText>
       {event.image ? (
-        <Image source={{ uri: event.image }} style={styles.eventImage} />
+        <Image source={{ uri: event.image }} style={{ 
+          width: '100%', 
+          height: 200, 
+          marginVertical: 16 
+        }} />
       ) : (
         <ThemedText>No Image Available</ThemedText>
       )}
-      <ThemedText style={styles.eventDescription}>{event.description}</ThemedText>
+      <ThemedText style={{ 
+        fontSize: 16, 
+        marginVertical: 8 
+      }}>
+        {event.description}
+      </ThemedText>
       <ThemedText>Number of people: {event.people}</ThemedText>
       <ThemedText>Drinks: {event.drinks}</ThemedText>
       <ThemedText>Ambience: {event.lightAmbience ? event.lightAmbience : "No information"}</ThemedText>
-      {/* <ThemedText>Ambience: {event.lightLevel}</ThemedText> */}
       <ThemedText>Intensity: {event.intensity ? event.intensity : "No information"}</ThemedText>
-      {/* <ThemedText>Intensity: X: {event.acceleration.x}, Y: {event.acceleration.y}, Z: {event.acceleration.z}</ThemedText> */}
       <Button title="Delete Event" onPress={handleDelete} />
     </ThemedView>
   );
+
 }
 
 const styles = StyleSheet.create({

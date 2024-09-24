@@ -4,45 +4,47 @@ import { useEventStore } from '../../../store/useEventStore';
 import * as ImagePicker from 'expo-image-picker';
 import { Accelerometer, LightSensor } from 'expo-sensors';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Location from 'expo-location';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+
+// Generate random location within Kortrijk
+function getRandomLocationInKortrijk() {
+  const minLat = 50.82;
+  const maxLat = 50.83;
+  const minLng = 3.25;
+  const maxLng = 3.28;
+
+  const latitude = Math.random() * (maxLat - minLat) + minLat;
+  const longitude = Math.random() * (maxLng - minLng) + minLng;
+
+  return {
+    latitude,
+    longitude,
+  };
+}
 
 export default function AddEventScreen() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [people, setPeople] = useState('');
   const [drinks, setDrinks] = useState('');
-  const [image, setImage] = useState(null); // This will store the image URI
+  const [image, setImage] = useState<string | null>(null);
   const [lightLevel, setLightLevel] = useState(0);
   const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
-  const [location, setLocation] = useState(null);
 
   const addEvent = useEventStore((state) => state.addEvent);
   const router = useRouter();
 
   useEffect(() => {
-    // Get current location
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        const loc = await Location.getCurrentPositionAsync({});
-        setLocation(loc.coords);
-      }
-    })();
 
-    // Subscribe to accelerometer
     const accelSubscription = Accelerometer.addListener((data) => {
       setAcceleration(data);
     });
 
-    // Subscribe to light sensor
     const lightSubscription = LightSensor.addListener((data) => {
       setLightLevel(data.illuminance);
     });
 
-    // Clean up sensors on unmount
     return () => {
       accelSubscription?.remove();
       lightSubscription?.remove();
@@ -58,11 +60,10 @@ export default function AddEventScreen() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri); // Save the image URI
+      setImage(result.assets[0].uri);
     }
   };
 
-  // Function to calculate light ambience
   const getLightAmbience = () => {
     if (lightLevel < 100) {
       return 'Low';
@@ -73,7 +74,6 @@ export default function AddEventScreen() {
     }
   };
 
-  // Function to calculate event intensity based on acceleration
   const getEventIntensity = () => {
     if (acceleration.x < 1 && acceleration.y < 1 && acceleration.z < 1) {
       return 'Low';
@@ -85,10 +85,7 @@ export default function AddEventScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!location) {
-      alert('Location is required');
-      return;
-    }
+    const randomLocation = getRandomLocationInKortrijk();
 
     const newEvent = {
       id: Date.now(),
@@ -96,8 +93,8 @@ export default function AddEventScreen() {
       description,
       people: Number(people),
       drinks,
-      image, // Save the image URI
-      location,
+      image: image || '',
+      location: randomLocation, // Use random location within Kortrijk
       lightLevel: lightLevel ? lightLevel.toFixed(2) : null,
       acceleration: {
         x: acceleration.x.toFixed(2),
@@ -113,58 +110,70 @@ export default function AddEventScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput placeholder="Event Name" value={name} onChangeText={setName} style={styles.input} />
-      <TextInput placeholder="Description" value={description} onChangeText={setDescription} style={styles.input} />
-      <TextInput placeholder="Number of People" value={people} onChangeText={setPeople} keyboardType="numeric" style={styles.input} />
-      <TextInput placeholder="Drinks" value={drinks} onChangeText={setDrinks} style={styles.input} />
-
-      {/* Display the light sensor and accelerometer values */}
-      <ThemedView style={styles.sensorContainer}>
-        <ThemedText style={styles.sensorText}>Light Level: {lightLevel ? lightLevel.toFixed(2) : 'Loading...'}</ThemedText>
-        <ThemedText>Light Ambience: {lightLevel ? getLightAmbience() : 'Loading...'}</ThemedText>
-        <ThemedText style={styles.sensorText}>
+    <View style={{ 
+        flex: 1, 
+        padding: 16, 
+        justifyContent: 'center', 
+        alignItems: 'center' 
+      }}>
+      <TextInput placeholder="Event Name" value={name} onChangeText={setName} style={{ 
+          borderBottomWidth: 1, 
+          width: '100%', 
+          marginBottom: 12, 
+          padding: 8 
+        }} 
+      />
+      <TextInput placeholder="Description" value={description} onChangeText={setDescription} style={{ 
+          borderBottomWidth: 1, 
+          width: '100%', 
+          marginBottom: 12, 
+          padding: 8 
+        }} 
+      />
+      <TextInput placeholder="Number of People" value={people} onChangeText={setPeople} keyboardType="numeric" style={{ 
+          borderBottomWidth: 1, 
+          width: '100%', 
+          marginBottom: 12, 
+          padding: 8 
+        }} 
+      />
+      <TextInput placeholder="Drinks" value={drinks} onChangeText={setDrinks} style={{ 
+          borderBottomWidth: 1, 
+          width: '100%', 
+          marginBottom: 12, 
+          padding: 8 
+        }} 
+      />
+      <ThemedView style={{
+        marginVertical: 12, 
+        padding: 10, 
+        borderColor: 'grey', 
+        borderWidth: 1, 
+        borderRadius: 8, 
+        backgroundColor: '#f9f9f9', 
+        width: '100%'
+      }}>
+        <ThemedText style={{ fontSize: 16, marginVertical: 4 }}>
+          Light Level: {lightLevel ? lightLevel.toFixed(2) : 'Loading...'}
+        </ThemedText>
+        <ThemedText>
+          Light Ambience: {lightLevel ? getLightAmbience() : 'Loading...'}
+        </ThemedText>
+        <ThemedText style={{ 
+          fontSize: 16, 
+          marginVertical: 4 
+        }}>
           Acceleration: X: {acceleration.x.toFixed(2)}, Y: {acceleration.y.toFixed(2)}, Z: {acceleration.z.toFixed(2)}
         </ThemedText>
       </ThemedView>
 
       <Button title="Pick Image" onPress={pickImage} />
-      {image && <Image source={{ uri: image }} style={styles.image} />}
+      {image && <Image source={{ uri: image }} style={{ 
+        width: 200, 
+        height: 200, 
+        marginVertical: 16 
+      }} />}
       <Button title="Add Event" onPress={handleSubmit} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  input: {
-    borderBottomWidth: 1,
-    width: '100%',
-    marginBottom: 12,
-    padding: 8,
-  },
-  sensorContainer: {
-    marginVertical: 12,
-    padding: 10,
-    borderColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: '#f9f9f9',
-    width: '100%',
-    textAlign: 'center',
-  },
-  sensorText: {
-    fontSize: 16,
-    marginVertical: 4,
-  },
-  image: {
-    width: 200,
-    height: 200,
-    marginVertical: 16,
-  },
-});

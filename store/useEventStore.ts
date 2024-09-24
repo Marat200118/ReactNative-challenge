@@ -10,6 +10,8 @@ type Event = {
   image: string;
   location: { latitude: number, longitude: number };
   lightLevel: number;
+  lightAmbience: string;
+  intensity: string;
   acceleration: { x: number, y: number, z: number };
 };
 
