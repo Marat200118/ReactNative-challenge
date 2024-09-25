@@ -84,3 +84,10 @@ export default function HomeScreen() {
     </ThemedView>
   );
 }
+
+
+// routes
+//Delete button smaller
+// Explore tab stays on [id]
+// custom marker
+

@@ -16,7 +16,7 @@ type Event = {
 };
 
 interface EventState {
-  events: Event[];
+  events: Event[]
   addEvent: (event: Event) => Promise<void>;
   deleteEvent: (id: number) => Promise<void>;
   loadEvents: () => Promise<void>;
