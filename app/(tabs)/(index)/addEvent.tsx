@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Button, Image, View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { TextInput, Button, Image, View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useEventStore } from '../../../store/useEventStore';
 import * as ImagePicker from 'expo-image-picker';
 import { Accelerometer, LightSensor } from 'expo-sensors';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 
-// Generate random location within Kortrijk
 function getRandomLocationInKortrijk() {
   const minLat = 50.82;
   const maxLat = 50.83;
@@ -23,6 +22,7 @@ function getRandomLocationInKortrijk() {
   };
 }
 
+
 export default function AddEventScreen() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -32,11 +32,18 @@ export default function AddEventScreen() {
   const [lightLevel, setLightLevel] = useState(0);
   const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
 
+  const [errors, setErrors] = useState({
+    name: false,
+    description: false,
+    people: false,
+    drinks: false,
+    image: false,
+  });
+
   const addEvent = useEventStore((state) => state.addEvent);
   const router = useRouter();
 
   useEffect(() => {
-
     const accelSubscription = Accelerometer.addListener((data) => {
       setAcceleration(data);
     });
@@ -71,7 +78,7 @@ export default function AddEventScreen() {
       return 'Medium';
     } else {
       return 'High';
-    }
+    } 
   };
 
   const getEventIntensity = () => {
@@ -85,8 +92,17 @@ export default function AddEventScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!name || !description || !people || !drinks || !image) {
-      Alert.alert('Error', 'All fields, including the image, must be filled in!');
+    const newErrors = {
+      name: !name,
+      description: !description,
+      people: !people,
+      drinks: !drinks,
+      image: !image,
+    };
+
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).some((error) => error)) {
       return;
     }
 
@@ -99,7 +115,7 @@ export default function AddEventScreen() {
       people: Number(people),
       drinks,
       image,
-      location: randomLocation, // Use random location within Kortrijk
+      location: randomLocation,
       lightLevel: lightLevel ? lightLevel.toFixed(2) : null,
       acceleration: {
         x: acceleration.x.toFixed(2),
@@ -114,52 +130,72 @@ export default function AddEventScreen() {
     router.push('/(tabs)/(index)');
   };
 
-    return (
-    <View style={styles.container}>
-      <TextInput 
-        placeholder="Event Name" 
-        value={name} 
-        onChangeText={setName} 
-        style={styles.input} 
-      />
-      <TextInput 
-        placeholder="Description" 
-        value={description} 
-        onChangeText={setDescription} 
-        style={styles.input} 
-      />
-      <TextInput 
-        placeholder="Number of People" 
-        value={people} 
-        onChangeText={setPeople} 
-        keyboardType="numeric" 
-        style={styles.input} 
-      />
-      <TextInput 
-        placeholder="Drinks" 
-        value={drinks} 
-        onChangeText={setDrinks} 
-        style={styles.input} 
-      />
-      
-      <ThemedView style={styles.sensorContainer}>
-        <ThemedText style={styles.sensorText}>
-          Light Ambience: {lightLevel ? getLightAmbience() : 'Loading...'}
-        </ThemedText>
-        <ThemedText style={styles.sensorText}>
-          Intensity: {acceleration.x ? getEventIntensity() : 'Loading...'}
-        </ThemedText>
-      </ThemedView>
+  return (
+    <ScrollView>
+      <View style={styles.container}>
+        <Stack.Screen options={{ title: 'Add Event' }} />
+        
+        <TextInput
+          placeholder="Event Name"
+          value={name}
+          onChangeText={setName}
+          style={[styles.input, errors.name && styles.errorInput]}
+        />
+        {errors.name && <Text style={styles.errorText}>Name is required</Text>}
+        
+        <TextInput
+          placeholder="Description"
+          value={description}
+          onChangeText={setDescription}
+          style={[styles.input, errors.description && styles.errorInput]}
+        />
+        {errors.description && <Text style={styles.errorText}>Description is required</Text>}
+        
+        <TextInput
+          placeholder="Number of People"
+          value={people}
+          onChangeText={setPeople}
+          keyboardType="numeric"
+          style={[styles.input, errors.people && styles.errorInput]}
+        />
+        {errors.people && <Text style={styles.errorText}>People count is required</Text>}
+        
+        <TextInput
+          placeholder="Drinks"
+          value={drinks}
+          onChangeText={setDrinks}
+          style={[styles.input, errors.drinks && styles.errorInput]}
+        />
+        {errors.drinks && <Text style={styles.errorText}>Drinks are required</Text>}
 
-      <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-        <Text style={styles.imageButtonText}>Pick Image</Text>
-      </TouchableOpacity>
-      {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
-      
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Add Event</Text>
-      </TouchableOpacity>
-    </View>
+        <ThemedView style={styles.sensorContainer}>
+          <ThemedText style={styles.sensorText}>
+            Light Ambience: {lightLevel ? getLightAmbience() : 'Loading...'}
+          </ThemedText>
+          <ThemedText style={styles.sensorText}>
+            Intensity: {acceleration.x ? getEventIntensity() : 'Loading...'}
+          </ThemedText>
+          <View style={{ marginTop: 12 }}>
+            <Text style={{ fontSize: 14, color: '#555', marginBottom: 4 }}>
+              The **Ambience** is determined by the light level in the area, giving you an idea of the environment’s brightness. 
+            </Text>
+            <Text style={{ fontSize: 14, color: '#555' }}>
+              The **Intensity** is measured based on the movement and activity in the area. These metrics are derived from **accelerometer** sensor of the device.
+            </Text>
+          </View>
+        </ThemedView>
+
+        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+          <Text style={styles.imageButtonText}>Pick Image</Text>
+        </TouchableOpacity>
+        {errors.image && <Text style={styles.errorText}>Image is required</Text>}
+        {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Add Event</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -180,16 +216,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
   },
+  errorInput: {
+    borderBottomColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+  },
   sensorContainer: {
     marginVertical: 12,
     padding: 10,
     borderColor: 'grey',
     borderWidth: 1,
     borderRadius: 8,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#BCFFB2',
     width: '100%',
   },
   sensorText: {
+    fontWeight: 'bold',
     fontSize: 16,
     color: '#333',
     marginVertical: 4,

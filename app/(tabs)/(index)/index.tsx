@@ -1,12 +1,11 @@
-//(index)/index.tsx
-
 import React, { useState, useEffect } from 'react';
-import MapView, { Marker } from 'react-native-maps';
-import { StyleSheet, View, Button } from 'react-native';
+import MapView, { Marker, Callout } from 'react-native-maps';
+import { StyleSheet, View, Image, Button } from 'react-native';
 import { useEventStore } from '@/store/useEventStore';
-import { router } from 'expo-router';
+import { router, Stack, useRouter } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemedText } from '@/components/ThemedText';
 
 // Generate random location within Kortrijk
 function getRandomLocationInKortrijk() {
@@ -36,19 +35,17 @@ export default function HomeScreen() {
   });
   const [storedEvents, setStoredEvents] = useState([]);
   const events = useEventStore((state) => state.events);
+  const loadEvents = useEventStore((state) => state.loadEvents);
+  const router = useRouter();
+  // console.log('events', events);
 
   useEffect(() => {
-
-    (async () => {
-      const stored = await AsyncStorage.getItem('events');
-      if (stored) {
-        setStoredEvents(JSON.parse(stored));
-      }
-    })();
+    loadEvents();
   }, []);
 
   return (
     <ThemedView style={{ flex: 1 }}>
+      <Stack.Screen options={{ title: 'Home page' }} />
       <MapView
         style={{ width: '100%', height: '100%' }}
         region={region}
@@ -61,33 +58,81 @@ export default function HomeScreen() {
           <Marker
             key={event.id}
             coordinate={event.location}
-            title={event.name}
-            description={event.description}
-            onPress={() => router.push(`/${event.id}`)}
-          />
+          >
+            <Callout
+              tooltip={true}
+              onPress={() => router.push(`/${event.id}`)}
+            >
+              <View style={styles.markerContainer}>
+                {(event.image) && (
+                  <Image
+                    source={{uri: event.image}} 
+                    style={styles.markerImage}
+                  />
+                )}
+                {/* <Image
+                  source={{uri: event.image}} 
+                  style={styles.markerImage}
+                /> */}
+                <View style={styles.markerTextContainer}>
+                  <ThemedText style={styles.markerText}>
+                    {event.name}
+                  </ThemedText>
+                </View>
+              </View>
+            </Callout>
+          </Marker>
         ))}
       </MapView>
-      <ThemedView
-        style={{
-          backgroundColor: 'yellow',
-          borderRadius: 8,
-          borderWidth: 2,
-          borderColor: 'black',
-          position: 'absolute',
-          bottom: 20,
-          left: 20,
-          right: 20,
-        }}
-      >
+
+      <ThemedView style={styles.addButtonContainer}>
         <Button title="Add Event" onPress={() => router.push('/addEvent')} />
       </ThemedView>
     </ThemedView>
   );
 }
 
-
-// routes
-//Delete button smaller
-// Explore tab stays on [id]
-// custom marker
-
+const styles = StyleSheet.create({
+  markerContainer: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 5,
+    elevation: 5,
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+    transform: [{ scale: 0.8 }],
+  },
+  markerImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginBottom: 5,
+    borderWidth: 2,
+    borderColor: 'white',
+  },
+  markerTextContainer: {
+    backgroundColor: '#ff6347', // Tomato color
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 5,
+  },
+  markerText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  addButtonContainer: {
+    backgroundColor: 'yellow',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'black',
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+});

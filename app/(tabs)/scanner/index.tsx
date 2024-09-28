@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Animated, Dimensions, Image, ScrollView } from 'react-native';
 import { Magnetometer } from 'expo-sensors';
 import * as Location from 'expo-location';
 import { ThemedView } from '@/components/ThemedView';
 import { useEventStore } from '@/store/useEventStore';
-import { Link } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -52,7 +52,7 @@ export default function ScannerScreen() {
   }, []);
 
   // Calculate angle from magnetometer data took from ChatGPT
-  const calculateAngle = (data: { x: number; y: number; z: number }) => {
+  const calculateAngle = (data: { x: number; y: number }) => {
     let { x, y } = data;
     let angle = Math.atan2(y, x) * (180 / Math.PI);
     if (angle < 0) {
@@ -99,7 +99,10 @@ export default function ScannerScreen() {
   });
 
   return (
-    <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1c1c1c' }}>
+    <ThemedView style={{ display: 'flex', flex: 1, justifyContent: 'space-around', alignItems: 'center', backgroundColor: '#1c1c1c' }}>
+      <Stack.Screen options={{ 
+        title: 'Scanner',
+      }} />
       <View style={{
         justifyContent: 'center',
         alignItems: 'center',
@@ -120,26 +123,89 @@ export default function ScannerScreen() {
       </View>
       <Text style={{ marginTop: 20, color: '#fff', fontSize: 20 }}>{`Angle: ${Math.round(magnetometer)}°`}</Text>
       <Text style={{ marginTop: 10, color: '#fff', fontSize: 16 }}>Turn around to find the direction of the events!</Text>
-
       {closeEvents.length > 0 ? (
+
         closeEvents.map((event) => (
           <Link key={event.id} href={`/${event.id}`}>
-            <ThemedView style={{
-              marginTop: 20,
-              padding: 15,
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              borderRadius: 8,
-              alignItems: 'center',
-              width: width * 0.8
-            }}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{`Event: ${event.name}`}</Text>
-              <Text>{event.description}</Text>
+            <ThemedView style={styles.eventCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.eventName}>{event.name}</Text>
+              </View>
+
+              <View style={styles.cardContent}>
+                <Text style={styles.descriptionLabel}>Description:</Text>
+                <Text style={styles.eventDescription}>{event.description}</Text>
+              </View>
+
+              <View style={styles.cardFooter}>
+                <Text style={styles.eventInfo}>Tap for more details</Text>
+              </View>
             </ThemedView>
           </Link>
         ))
       ) : (
-        <Text style={{ marginTop: 20, color: '#fff', fontSize: 16 }}>No events in this direction</Text>
+        <Text style={styles.noEventsText}>No events in this direction</Text>
       )}
     </ThemedView>
   );
 }
+
+
+const styles = StyleSheet.create({
+  eventCard: {
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: '#BCCB3B',
+    borderRadius: 12,
+    alignItems: 'center',
+    width: width * 0.85,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8, // for Android shadow
+    transition: 'all 0.3s ease',
+  },
+  cardHeader: {
+    marginBottom: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingBottom: 10,
+  },
+  eventName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  cardContent: {
+    marginBottom: 15,
+  },
+  descriptionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#777',
+    marginBottom: 5,
+  },
+  eventDescription: {
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'center',
+    paddingHorizontal: 10,
+  },
+  cardFooter: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  eventInfo: {
+    fontSize: 14,
+    color: '#007BFF',
+    fontWeight: '600',
+  },
+  noEventsText: {
+    marginTop: 20,
+    color: '#F39C18',
+    fontSize: 16,
+  },
+});

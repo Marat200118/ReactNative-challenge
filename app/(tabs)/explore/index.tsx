@@ -21,6 +21,7 @@ export default function ExploreScreen() {
       padding: 16 
     }}>
       <Stack.Screen options={{ 
+        title: 'Explore',
         headerBackVisible: true 
       }} />
       {events.length > 0 ? (
@@ -29,11 +30,11 @@ export default function ExploreScreen() {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => router.push(`/${item.id}`)}
+              onPress={() => router.push(`/explore/${item.id}`)}
               style={{
                 flexDirection: 'row',
                 padding: 16,
-                backgroundColor: '#fff', // White background for event item
+                backgroundColor: '#fff',
                 marginVertical: 8,
                 borderRadius: 10,
                 shadowColor: '#000',
