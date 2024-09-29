@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import { StyleSheet, View, Image, Button } from 'react-native';
+import { StyleSheet, View, Button } from 'react-native';
 import { useEventStore } from '@/store/useEventStore';
-import { router, Stack, useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from '@/components/ThemedText';
 
 // Generate random location within Kortrijk
@@ -13,7 +12,6 @@ function getRandomLocationInKortrijk() {
   const maxLat = 50.83;
   const minLng = 3.25;
   const maxLng = 3.28;
-
   const latitude = Math.random() * (maxLat - minLat) + minLat;
   const longitude = Math.random() * (maxLng - minLng) + minLng;
 
@@ -37,7 +35,6 @@ export default function HomeScreen() {
   const events = useEventStore((state) => state.events);
   const loadEvents = useEventStore((state) => state.loadEvents);
   const router = useRouter();
-  // console.log('events', events);
 
   useEffect(() => {
     loadEvents();
@@ -64,16 +61,6 @@ export default function HomeScreen() {
               onPress={() => router.push(`/${event.id}`)}
             >
               <View style={styles.markerContainer}>
-                {(event.image) && (
-                  <Image
-                    source={{uri: event.image}} 
-                    style={styles.markerImage}
-                  />
-                )}
-                {/* <Image
-                  source={{uri: event.image}} 
-                  style={styles.markerImage}
-                /> */}
                 <View style={styles.markerTextContainer}>
                   <ThemedText style={styles.markerText}>
                     {event.name}
@@ -100,6 +87,7 @@ const styles = StyleSheet.create({
     padding: 5,
     elevation: 5,
     shadowColor: '#000', 
+    maxHeight: 50,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 3,
@@ -114,7 +102,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
   },
   markerTextContainer: {
-    backgroundColor: '#ff6347', // Tomato color
+    backgroundColor: '#ff6347',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 5,

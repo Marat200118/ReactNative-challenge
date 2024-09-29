@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { Magnetometer } from 'expo-sensors';
 import * as Location from 'expo-location';
 import { ThemedView } from '@/components/ThemedView';
@@ -51,7 +51,7 @@ export default function ScannerScreen() {
     };
   }, []);
 
-  // Calculate angle from magnetometer data took from ChatGPT
+  // Calculate angle from magnetometer data - took from ChatGPT
   const calculateAngle = (data: { x: number; y: number }) => {
     let { x, y } = data;
     let angle = Math.atan2(y, x) * (180 / Math.PI);
@@ -79,7 +79,6 @@ export default function ScannerScreen() {
   useEffect(() => {
     if (userLocation) {
       const nearbyEvents: Event[] = [];
-
       events.forEach((event) => {
         const eventDirection = calculateBearing(userLocation, event.location);
         const tolerance = 15; // Allow a 15-degree margin
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 8, // for Android shadow
+    elevation: 8,
     transition: 'all 0.3s ease',
   },
   cardHeader: {

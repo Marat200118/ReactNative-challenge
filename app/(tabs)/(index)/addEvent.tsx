@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Button, Image, View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { TextInput, Image, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useEventStore } from '../../../store/useEventStore';
 import * as ImagePicker from 'expo-image-picker';
 import { Accelerometer, LightSensor } from 'expo-sensors';
@@ -12,7 +12,6 @@ function getRandomLocationInKortrijk() {
   const maxLat = 50.83;
   const minLng = 3.25;
   const maxLng = 3.28;
-
   const latitude = Math.random() * (maxLat - minLat) + minLat;
   const longitude = Math.random() * (maxLng - minLng) + minLng;
 
@@ -21,7 +20,6 @@ function getRandomLocationInKortrijk() {
     longitude,
   };
 }
-
 
 export default function AddEventScreen() {
   const [name, setName] = useState('');
@@ -73,21 +71,21 @@ export default function AddEventScreen() {
 
   const getLightAmbience = () => {
     if (lightLevel < 100) {
-      return 'Low';
+      return 'Dark Atmosphere';
     } else if (lightLevel < 500) {
-      return 'Medium';
+      return 'Dimly Lit';
     } else {
-      return 'High';
+      return 'Bright Environment';
     } 
   };
 
   const getEventIntensity = () => {
     if (acceleration.x < 1 && acceleration.y < 1 && acceleration.z < 1) {
-      return 'Low';
+      return 'Peaceful';
     } else if (acceleration.x < 2 && acceleration.y < 2 && acceleration.z < 2) {
-      return 'Medium';
+      return 'Moderate';
     } else {
-      return 'High';
+      return 'Highly Active';
     }
   };
 
@@ -134,6 +132,9 @@ export default function AddEventScreen() {
     <ScrollView>
       <View style={styles.container}>
         <Stack.Screen options={{ title: 'Add Event' }} />
+        <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16, color: '#333' }}>
+          Add Your Event!
+        </Text>
         
         <TextInput
           placeholder="Event Name"

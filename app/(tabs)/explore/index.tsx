@@ -1,10 +1,7 @@
-//(explore)/index.tsx
-
 import React, { useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useEventStore } from '@/store/useEventStore';
 import { useRouter, Stack } from 'expo-router';
-
 
 export default function ExploreScreen() {
   const events = useEventStore((state) => state.events);
